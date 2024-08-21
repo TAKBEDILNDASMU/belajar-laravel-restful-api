@@ -1,0 +1,310 @@
+openapi: 3.0.3
+info: 
+  title: Contact API Specification 
+  version: 1.0.0
+servers: 
+  - url: localhost:8000
+paths: 
+  /api/contact:
+    post: 
+      summary: post a new contact
+      parameters:
+        - name: X-API-TOKEN
+          in: header
+          schema: 
+            type: string
+          required: true
+      requestBody: 
+        content: 
+          application/json: 
+            schema: 
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: Spongebob Squarepants
+                phone: 
+                  type: string
+                  example: "084213215123"
+                email:
+                  type: string
+                  example: spongebob@bikinibottom.com
+                      
+      responses:
+        '201':
+          description: Succesfully created a new contact
+          content: 
+            application/json:
+              schema: 
+                type: object
+                properties:
+                  data: 
+                    type: object
+                    properties: 
+                      name:
+                        type: string
+                        example: Spongebob Squarepants
+                      phone: 
+                        type: string
+                        example: "084213215123"
+                      email:
+                        type: string
+                        example: spongebob@bikinibottom.com
+        '401': 
+          description : "Unauthorized"
+          content: 
+            application/json: 
+              schema: 
+                type: object
+                properties: 
+                  errors: 
+                    type: string
+                    example: "Unauthorized"
+        '400':
+          description: Invalid request
+          content: 
+            application/json:
+              schema: 
+                type: object
+                properties:
+                  errors:
+                    type: string
+                    example: "Name can't be null"
+                    
+    get: 
+      summary: search contacts
+      parameters:
+        - name: X-API-TOKEN
+          in: header
+          schema: 
+            type: string
+          required: true
+        - name: name
+          in: query
+          schema: 
+            type: string
+        - name: email
+          in: query
+          schema: 
+            type: string
+        - name: phone
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Succesfully search contacts (in array)
+          content: 
+            application/json:
+              schema: 
+                type: object
+                properties:
+                  data: 
+                    type: array
+                    items: 
+                     properties:
+                        name:
+                          type: string
+                          example: Spongebob Squarepants
+                        phone: 
+                          type: string
+                          example: "084213215123"
+                        email:
+                          type: string
+                          example: spongebob@bikinibottom.com
+        '401': 
+          description : "Unauthorized"
+          content: 
+            application/json: 
+              schema: 
+                type: object
+                properties: 
+                  errors: 
+                    type: string
+                    example: "Unauthorized"
+        '400':
+          description: Invalid request
+          content: 
+            application/json:
+              schema: 
+                type: object
+                properties:
+                  errors:
+                    type: string
+                    example: "Invalid Request" 
+     
+    
+              
+  /api/contact/list: 
+    get: 
+      summary: get a list of contacts
+      parameters:
+        - name: X-API-TOKEN
+          in: header
+          schema: 
+            type: string
+          required: true
+      responses:
+        '200':
+          description: Succesfully get a list of contacts (in array)
+          content: 
+            application/json:
+              schema: 
+                type: object
+                properties:
+                  data: 
+                    type: array
+                    items: 
+                     properties:
+                        name:
+                          type: string
+                          example: Spongebob Squarepants
+                        phone: 
+                          type: string
+                          example: "084213215123"
+                        email:
+                          type: string
+                          example: spongebob@bikinibottom.com
+                        
+        '401': 
+          description : "Unauthorized"
+          content: 
+            application/json: 
+              schema: 
+                type: object
+                properties: 
+                  errors: 
+                    type: string
+                    example: "Unauthorized"
+    
+  
+  /api/contact/{contactId}:    
+    put:
+      summary: update an existing contact
+      parameters:
+        - name: X-API-TOKEN
+          in: header
+          schema: 
+            type: string
+          required: true
+        - name: contactId
+          in: path
+          required: true
+          schema: 
+            type: integer
+      requestBody: 
+        content: 
+          application/json: 
+            schema: 
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: Spongebob Squarepants
+                phone: 
+                  type: string
+                  example: "084213215123"
+                email:
+                  type: string
+                  example: spongebob@bikinibottom.com
+      responses:
+        '200':
+          description: Succesfully update a contact
+          content: 
+            application/json:
+              schema: 
+                type: object
+                properties:
+                  data: 
+                   properties:
+                    name:
+                      type: string
+                      example: Spongebob Squarepants
+                    phone: 
+                      type: string
+                      example: "084213215123"
+                    email:
+                      type: string
+                      example: spongebob@bikinibottom.com
+                        
+        '401': 
+          description : "Unauthorized"
+          content: 
+            application/json: 
+              schema: 
+                type: object
+                properties: 
+                  errors: 
+                    type: string
+                    example: "Unauthorized"
+        '404': 
+          description : "Not found"
+          content: 
+            application/json: 
+              schema: 
+                type: object
+                properties: 
+                  errors: 
+                    type: string
+                    example: "Contact is not found"
+    
+    delete: 
+      summary: delete an existing contact
+      parameters:
+        - name: X-API-TOKEN
+          in: header
+          schema: 
+            type: string
+          required: true
+        - name: contactId
+          in: path
+          required: true
+          schema: 
+            type: integer
+      responses:
+        '200':
+          description: Succesfully Delete a contact
+          content: 
+            application/json:
+              schema: 
+                type: object
+                properties:
+                  data: 
+                   type: string
+                   example: OK
+        '401': 
+          description : "Unauthorized"
+          content: 
+            application/json: 
+              schema: 
+                type: object
+                properties: 
+                  errors: 
+                    type: string
+                    example: "Unauthorized"
+        '404': 
+          description : "Not found"
+          content: 
+            application/json: 
+              schema: 
+                type: object
+                properties: 
+                  errors: 
+                    type: string
+                    example: "Contact is not found"
+              
+              
+              
+              
+              
+              
+              
+              
+              
+              
+              
+              
+              
+              
+              
+                    

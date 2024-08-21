@@ -1,0 +1,252 @@
+openapi: 3.0.3
+info:
+  title: User API Specification
+  version: 1.0.0
+servers:
+  - url: localhost:8000
+paths:
+  /api/users:
+    post:
+      summary: register a new user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: Patrick
+                email:
+                  type: string
+                  example: patrick@bikinibottom.com
+                password:
+                  type: string
+                  example: spongebobismybestfriend
+                age:
+                  type: number
+                  example: 20
+      responses:
+        "201":
+          description: "Successfully register a new user"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                        example: Patrick
+                      email:
+                        type: string
+                        example: patrick@bikinibottom.com
+                      age:
+                        type: number
+                        example: 20
+        "400":
+          description: "Invalid request"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: object
+                    properties:
+                      name:
+                        type: array
+                        example:
+                          - username can't be null
+                          - max username character is 100
+                      email:
+                        type: array
+                        example:
+                          - email can't be null
+                          - Only accept email type
+  /api/users/login:
+    post:
+      summary: Login into existing user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: patrick@bikinibottom.com
+                password:
+                  type: string
+                  example: spongebobismybestfriend
+      responses:
+        "200":
+          description: Login success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    properties:
+                      email:
+                        type: string
+                        example: patrick@bikinibottom.com
+                      token:
+                        type: string
+                        example: Token
+
+        "400":
+          description: "Invalid request"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: string
+                    example: "Username or Password is wrong"
+
+  /api/users/current:
+    get:
+      summary: get current user information
+      parameters:
+        - name: X-API-TOKEN
+          in: header
+          schema:
+            type: string
+          required: true
+      responses:
+        "200":
+          description: Get User Information
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    properties:
+                      name:
+                        type: string
+                        example: Patrick
+                      email:
+                        type: string
+                        example: patrick@bikinibottom.com
+                      age:
+                        type: integer
+                        example: 15
+        "401":
+          description: "Invalid request"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: string
+                    example: "Unauthorized"
+    patch:
+      summary: update current user data
+      parameters:
+        - name: X-API-TOKEN
+          in: header
+          schema:
+            type: string
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: patrick@bikinibottom.com
+                password:
+                  type: string
+                  example: spongebobismybestfriend
+                age:
+                  type: integer
+                  example: 20
+      responses:
+        "200":
+          description: Update user information
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    properties:
+                      name:
+                        type: string
+                        example: Patrick
+                      email:
+                        type: string
+                        example: patrick@bikinibottom.com
+                      age:
+                        type: integer
+                        example: 15
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: object
+                    properties:
+                      name:
+                        type: array
+                        example:
+                          - username can't be null
+                          - max username character is 100
+                      email:
+                        type: array
+                        example:
+                          - email can't be null
+                          - Only accept email type
+
+        "401":
+          description: "Invalid request"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: string
+                    example: "Unauthorized"
+
+  /api/users/logout:
+    delete:
+      parameters:
+        - name: X-API-TOKEN
+          in: header
+          schema:
+            type: string
+          required: true
+      responses:
+        "200":
+          description: logout user successfull
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: boolean
+                    example: true
+        "401":
+          description: "Invalid request"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: string
+                    example: "Unauthorized"

@@ -1,0 +1,352 @@
+openapi: 3.0.3
+info: 
+  title: Contact API Specification 
+  version: 1.0.0
+servers: 
+  - url: localhost:8000
+paths: 
+              
+  /api/contact/{contactId}/addresses:
+    post: 
+      summary: post a new address
+      parameters:
+        - name: X-API-TOKEN
+          in: header
+          schema: 
+            type: string
+          required: true
+        - name: contactId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody: 
+        content: 
+          application/json: 
+            schema: 
+              type: object
+              properties:
+                street:
+                  type: string
+                  example: dukuh krajan
+                village: 
+                  type: string
+                  example: sugihan
+                district:
+                  type: string
+                  example: pulung
+                city: 
+                  type: string
+                  example: ponorogo
+                province:
+                  type: string
+                  example: jawa timur
+                state: 
+                  type: string
+                  example: indonesia
+                postal_code:
+                  type: string
+                  example: 645123
+      responses:
+        '201':
+          description: Succesfully created a new address
+          content: 
+            application/json:
+              schema: 
+                type: object
+                properties:
+                  data: 
+                    type: object
+                    properties:
+                      street:
+                        type: string
+                        example: dukuh krajan
+                      village: 
+                        type: string
+                        example: sugihan
+                      district:
+                        type: string
+                        example: pulung
+                      city: 
+                        type: string
+                        example: ponorogo
+                      province:
+                        type: string
+                        example: jawa timur
+                      state: 
+                        type: string
+                        example: indonesia
+                      postal_code:
+                        type: string
+                        example: 645123
+                      
+        '404': 
+          description : "contact not found"
+          content: 
+            application/json: 
+              schema: 
+                type: object
+                properties: 
+                  errors: 
+                    type: string
+                    example: "Contact is not found"
+        '400':
+          description: Invalid request
+          content: 
+            application/json:
+              schema: 
+                type: object
+                properties:
+                  errors:
+                    type: string
+                    example: "street can't be null"
+              
+    get: 
+      summary: get a list of addresses
+      parameters:
+        - name: X-API-TOKEN
+          in: header
+          schema: 
+            type: string
+          required: true
+        - name: contactId
+          in: path
+          required: true
+          schema:
+            type: string    
+      responses:
+        '200':
+          description: Succesfully get a list of addresses (in array)
+          content: 
+            application/json:
+              schema: 
+                type: object
+                properties:
+                  data: 
+                    type: array
+                    items:
+                      properties:
+                        street:
+                          type: string
+                          example: dukuh krajan
+                        village: 
+                          type: string
+                          example: sugihan
+                        district:
+                          type: string
+                          example: pulung
+                        city: 
+                          type: string
+                          example: ponorogo
+                        province:
+                          type: string
+                          example: jawa timur
+                        state: 
+                          type: string
+                          example: indonesia
+                        postal_code:
+                          type: string
+                          example: 645123
+        '404': 
+          description : "contact not found"
+          content: 
+            application/json: 
+              schema: 
+                type: object
+                properties: 
+                  errors: 
+                    type: string
+                    example: "Contact is not found"
+              
+              
+  /api/contact/{contactId}/addresses/{addressId}:
+    put: 
+      summary: Update an existing address
+      parameters:
+        - name: X-API-TOKEN
+          in: header
+          schema: 
+            type: string
+          required: true
+        - name: contactId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: addressId
+          in: path
+          required: true
+          schema: 
+            type: integer    
+      requestBody: 
+        content: 
+          application/json: 
+            schema: 
+              type: object
+              properties:
+                street:
+                  type: string
+                  example: dukuh krajan
+                village: 
+                  type: string
+                  example: sugihan
+                district:
+                  type: string
+                  example: pulung
+                city: 
+                  type: string
+                  example: ponorogo
+                province:
+                  type: string
+                  example: jawa timur
+                state: 
+                  type: string
+                  example: indonesia
+                postal_code:
+                  type: string
+                  example: 645123
+      responses:
+        '200':
+          description: Succesfully update a contact
+          content: 
+            application/json:
+              schema: 
+                type: object
+                properties:
+                  data: 
+                    type: object
+                    properties:
+                      street:
+                        type: string
+                        example: dukuh krajan
+                      village: 
+                        type: string
+                        example: sugihan
+                      district:
+                        type: string
+                        example: pulung
+                      city: 
+                        type: string
+                        example: ponorogo
+                      province:
+                        type: string
+                        example: jawa timur
+                      state: 
+                        type: string
+                        example: indonesia
+                      postal_code:
+                        type: string
+                        example: 645123
+        '404': 
+          description : "address not found"
+          content: 
+            application/json: 
+              schema: 
+                type: object
+                properties: 
+                  errors: 
+                    type: string
+                    example: "address is not found"
+              
+    get: 
+      summary: Get an address from contact
+      parameters:
+        - name: X-API-TOKEN
+          in: header
+          schema: 
+            type: string
+          required: true
+        - name: contactId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: addressId
+          in: path
+          required: true
+          schema: 
+            type: integer
+      responses:
+        '200':
+          description: Succesfully get a contact
+          content: 
+            application/json:
+              schema: 
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties: 
+                      street:
+                        type: string
+                        example: dukuh krajan
+                      village: 
+                        type: string
+                        example: sugihan
+                      district:
+                        type: string
+                        example: pulung
+                      city: 
+                        type: string
+                        example: ponorogo
+                      province:
+                        type: string
+                        example: jawa timur
+                      state: 
+                        type: string
+                        example: indonesia
+                      postal_code:
+                        type: string
+                        example: 645123
+        '404': 
+          description : "contact not found"
+          content: 
+            application/json: 
+              schema: 
+                type: object
+                properties: 
+                  errors: 
+                    type: string
+                    example: "Contact is not found"
+                    
+    delete:
+      summary: Delete an existing address
+      parameters:
+        - name: X-API-TOKEN
+          in: header
+          schema: 
+            type: string
+          required: true
+        - name: contactId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: addressId
+          in: path
+          required: true
+          schema: 
+            type: integer
+      responses:
+        '200':
+          description: Succesfully delete a contact
+          content: 
+            application/json:
+              schema: 
+                type: object
+                properties:
+                  data: 
+                    type: string
+                    example: OK
+        '404': 
+          description : "address not found"
+          content: 
+            application/json: 
+              schema: 
+                type: object
+                properties: 
+                  errors: 
+                    type: string
+                    example: "address is not found"
+              
+                    
