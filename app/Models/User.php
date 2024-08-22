@@ -18,7 +18,7 @@ class User extends Model
         'name',
         'email',
         'password',
-        'age'
+        'age',
     ];
 
     public function contacts(): HasMany

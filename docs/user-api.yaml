@@ -106,8 +106,11 @@ paths:
                 type: object
                 properties:
                   errors:
-                    type: string
-                    example: "Username or Password is wrong"
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: "Username or Password is wrong"
 
   /api/users/current:
     get:
@@ -145,8 +148,11 @@ paths:
                 type: object
                 properties:
                   errors:
-                    type: string
-                    example: "Unauthorized"
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: "Unauthorized"
     patch:
       summary: update current user data
       parameters:
@@ -248,5 +254,8 @@ paths:
                 type: object
                 properties:
                   errors:
-                    type: string
-                    example: "Unauthorized"
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: "Unauthorized"
