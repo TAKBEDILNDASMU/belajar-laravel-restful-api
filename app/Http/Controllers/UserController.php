@@ -56,7 +56,7 @@ class UserController extends Controller
     public function update(UserUpdateRequest $request): UserResource
     {
         $data = $request->validated();
-        $user = Auth::user();
+        $user = User::find(Auth::user()->id);
 
 
         if (isset($data['name'])) {
@@ -73,5 +73,16 @@ class UserController extends Controller
 
         $user->save();
         return new UserResource($user);
+    }
+
+    public function logout(Request $request): JsonResponse
+    {
+        $user = User::find(Auth::user()->id);
+
+        $user->token = null;
+        $user->save();
+        return response()->json([
+            'data' => true
+        ])->setStatusCode(200);
     }
 }
