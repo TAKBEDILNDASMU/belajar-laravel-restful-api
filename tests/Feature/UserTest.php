@@ -6,6 +6,7 @@ use App\Models\User;
 use Database\Seeders\UserSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
 
 class UserTest extends TestCase
@@ -104,6 +105,123 @@ class UserTest extends TestCase
             ->assertJson([
                 "errors" => [
                     'message' => 'Email or password wrong'
+                ]
+            ]);
+    }
+
+    public function testGetSuccess()
+    {
+        $this->seed([UserSeeder::class]);
+
+        $this->get('/api/users/current', [
+            'Authorization' => "test"
+        ])->assertStatus(200)
+            ->assertJson([
+                "data" => [
+                    'name' => 'test',
+                    'email' => 'test@test.com',
+                    'age' => 20
+                ]
+            ]);
+    }
+
+    public function testGetUnauthorized()
+    {
+        $this->seed([UserSeeder::class]);
+
+        $this->get('/api/users/current')->assertStatus(401)
+            ->assertJson([
+                "errors" => [
+                    'message' => 'Unauthorized',
+                ]
+            ]);
+    }
+
+    public function testGetInvalidToken()
+    {
+        $this->seed([UserSeeder::class]);
+
+        $this->get('/api/users/current', [
+            'Authorization' => "Salah"
+        ])->assertStatus(401)
+            ->assertJson([
+                "errors" => [
+                    'message' => 'Unauthorized',
+                ]
+            ]);
+    }
+
+    public function testUpdatePasswordSuccess()
+    {
+        $this->seed([UserSeeder::class]);
+
+        $this->patch('/api/users/current', [
+            'password' => 'testNew',
+        ], [
+            'Authorization' => "test"
+        ])->assertStatus(200)
+            ->assertJson([
+                "data" => [
+                    'name' => 'test',
+                    'email' => 'test@test.com',
+                    'age' => 20
+                ]
+            ]);
+
+        $user = User::where('email', 'test@test.com')->first();
+        self::assertTrue(Hash::check("testNew", $user->password));
+    }
+
+    public function testUpdateNameSuccess()
+    {
+        $this->seed([UserSeeder::class]);
+
+        $this->patch('/api/users/current', [
+            'name' => 'testNew',
+        ], [
+            'Authorization' => "test"
+        ])->assertStatus(200)
+            ->assertJson([
+                "data" => [
+                    'name' => 'testNew',
+                    'email' => 'test@test.com',
+                    'age' => 20
+                ]
+            ]);
+    }
+
+    public function testUpdateAgeSuccess()
+    {
+        $this->seed([UserSeeder::class]);
+
+        $this->patch('/api/users/current', [
+            'age' => '25',
+        ], [
+            'Authorization' => "test"
+        ])->assertStatus(200)
+            ->assertJson([
+                "data" => [
+                    'name' => 'test',
+                    'email' => 'test@test.com',
+                    'age' => 25
+                ]
+            ]);
+    }
+
+    public function testUpdateFailed()
+    {
+        $this->seed([UserSeeder::class]);
+
+        $this->patch('/api/users/current', [
+            'name' => 'EkoEkoEkoEkoEkoEkoEkoEkoEkoEkoEkoEkoEkoEkoEkoEkoEkoEkoEkoEkoEkoEkoEkoEkoEkoEkoEkoEkoEkoEkoEkoEkoEkoEkoEkoEkoEkoEkoEkoEkoEkoEkoEkoEkoEkoEkoEkoEkoEkoEkoEkoEkoEkoEkoEkoEkoEkoEkoEkoEkoEkoEkoEkoEkoEkoEkoEkoEkoEkoEkoEkoEkoEkoEkoEkoEkoEkoEkoEkoEkoEkoEkoEkoEkoEkoEkoEkoEkoEkoEkoEkoEkoEkoEkoEkoEkoEkoEkoEkoEkoEkoEkoEkoEkoEkoEkoEkoEko',
+        ], [
+            'Authorization' => "test"
+        ])->assertStatus(400)
+            ->assertJson([
+                "errors" => [
+                    'name' => [
+                        "The name field must not be greater than 100 characters."
+                    ]
                 ]
             ]);
     }

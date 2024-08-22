@@ -167,9 +167,9 @@ paths:
             schema:
               type: object
               properties:
-                email:
+                name:
                   type: string
-                  example: patrick@bikinibottom.com
+                  example: patrickStar
                 password:
                   type: string
                   example: spongebobismybestfriend
@@ -188,13 +188,13 @@ paths:
                     properties:
                       name:
                         type: string
-                        example: Patrick
+                        example: patrickStar
                       email:
                         type: string
                         example: patrick@bikinibottom.com
                       age:
                         type: integer
-                        example: 15
+                        example: 20
         "400":
           description: Invalid request
           content:
