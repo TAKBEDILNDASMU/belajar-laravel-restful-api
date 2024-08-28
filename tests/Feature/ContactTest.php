@@ -127,6 +127,23 @@ class ContactTest extends TestCase
             ]);
     }
 
+    public function testGetContactWithString()
+    {
+        $this->seed([UserSeeder::class, ContactSeeder::class]);
+
+        $user = User::where('name', 'test')->first();
+        $contact = Contact::where('user_id', $user->id)->first();
+
+        $this->get('/api/contacts/hellothere', headers: [
+            'Authorization' => 'test'
+        ])->assertStatus(404)
+            ->assertJson([
+                "errors" => [
+                    "message" => "Contact is not found"
+                ]
+            ]);
+    }
+
     public function testUpdateContactName()
     {
         $this->seed([UserSeeder::class, ContactSeeder::class]);

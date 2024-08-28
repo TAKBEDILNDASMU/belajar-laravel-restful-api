@@ -1,8 +1,10 @@
 <?php
 
+use App\Http\Controllers\AddressController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\UserController;
 use App\Http\Middleware\ApiAuthMiddleware;
+use App\Http\Middleware\ValidateContactId;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -18,7 +20,10 @@ Route::middleware(ApiAuthMiddleware::class)->group(function () {
     // Contact API
     Route::post('/contacts', [ContactController::class, 'create'])->name('contact.create');
     Route::get('/contacts', [ContactController::class, 'search'])->name('contact.search');
-    Route::get('/contacts/{contactId}', [ContactController::class, 'get'])->name('contact.get');
-    Route::put('/contacts/{contactId}', [ContactController::class, 'update'])->name('contact.update');
-    Route::delete('/contacts/{contactId}', [ContactController::class, 'delete'])->name('contact.delete');
+    Route::get('/contacts/{contactId}', [ContactController::class, 'get'])->name('contact.get')->middleware(ValidateContactId::class);;
+    Route::put('/contacts/{contactId}', [ContactController::class, 'update'])->name('contact.update')->middleware(ValidateContactId::class);;
+    Route::delete('/contacts/{contactId}', [ContactController::class, 'delete'])->name('contact.delete')->middleware(ValidateContactId::class);;
+
+    // Address API
+    Route::post('/contacts/{contactId}/addresses', [AddressController::class, 'create'])->name('address.create')->middleware(ValidateContactId::class);
 });
