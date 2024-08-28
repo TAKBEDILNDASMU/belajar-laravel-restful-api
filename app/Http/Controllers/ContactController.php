@@ -3,10 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ContactCreateRequest;
+use App\Http\Requests\PaginationRequest;
 use App\Http\Requests\UpdateContactRequest;
+use App\Http\Resources\ContactCollection;
 use App\Http\Resources\ContactResource;
 use App\Models\Contact;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -100,5 +103,36 @@ class ContactController extends Controller
         return response()->json([
             "data" => true
         ])->setStatusCode(200);
+    }
+
+    public function search(PaginationRequest $request): ContactCollection
+    {
+        $user = Auth::user();
+        $page = $request->input('page', 1);
+        $size = $request->input('size', 10);
+
+        $contacts = Contact::query()
+            ->where('user_id', $user->id)
+            ->where(function (Builder $builder) use ($request) {
+                $name = $request->input('name');
+
+                if ($name) {
+                    $builder->where("name", 'like', '%' . $name . '%');
+                }
+
+                $phone = $request->input("phone");
+
+                if ($phone) {
+                    $builder->where("phone", 'like', '%' . $phone . '%');
+                }
+
+                $email = $request->input('email');
+
+                if ($email) {
+                    $builder->where('email', 'like', '%' . $email . '%');
+                }
+            })->paginate(perPage: $size, page: $page);
+
+        return new ContactCollection($contacts);
     }
 }

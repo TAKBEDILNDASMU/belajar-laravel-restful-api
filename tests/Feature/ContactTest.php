@@ -5,9 +5,11 @@ namespace Tests\Feature;
 use App\Models\Contact;
 use App\Models\User;
 use Database\Seeders\ContactSeeder;
+use Database\Seeders\SearchContactSeeder;
 use Database\Seeders\UserSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Support\Facades\Log;
 use Tests\TestCase;
 
 class ContactTest extends TestCase
@@ -91,8 +93,7 @@ class ContactTest extends TestCase
 
     public function testGetContactSuccess()
     {
-        $this->seed([UserSeeder::class]);
-        $this->seed([ContactSeeder::class]);
+        $this->seed([UserSeeder::class, ContactSeeder::class]);
 
         $user = User::where('name', 'test')->first();
         $contact = Contact::where('user_id', $user->id)->first();
@@ -111,8 +112,7 @@ class ContactTest extends TestCase
 
     public function testGetContactNotFound()
     {
-        $this->seed([UserSeeder::class]);
-        $this->seed([ContactSeeder::class]);
+        $this->seed([UserSeeder::class, ContactSeeder::class]);
 
         $user = User::where('name', 'test')->first();
         $contact = Contact::where('user_id', $user->id)->first();
@@ -129,8 +129,7 @@ class ContactTest extends TestCase
 
     public function testUpdateContactName()
     {
-        $this->seed([UserSeeder::class]);
-        $this->seed([ContactSeeder::class]);
+        $this->seed([UserSeeder::class, ContactSeeder::class]);
 
         $user = User::where('name', 'test')->first();
         $contact = Contact::where('user_id', $user->id)->first();
@@ -151,8 +150,7 @@ class ContactTest extends TestCase
 
     public function testUpdateContactPhone()
     {
-        $this->seed([UserSeeder::class]);
-        $this->seed([ContactSeeder::class]);
+        $this->seed([UserSeeder::class, ContactSeeder::class]);
 
         $user = User::where('name', 'test')->first();
         $contact = Contact::where('user_id', $user->id)->first();
@@ -173,8 +171,7 @@ class ContactTest extends TestCase
 
     public function testUpdateContactEmail()
     {
-        $this->seed([UserSeeder::class]);
-        $this->seed([ContactSeeder::class]);
+        $this->seed([UserSeeder::class, ContactSeeder::class]);
 
         $user = User::where('name', 'test')->first();
         $contact = Contact::where('user_id', $user->id)->first();
@@ -195,8 +192,7 @@ class ContactTest extends TestCase
 
     public function testUpdateFailed()
     {
-        $this->seed([UserSeeder::class]);
-        $this->seed([ContactSeeder::class]);
+        $this->seed([UserSeeder::class, ContactSeeder::class]);
 
         $user = User::where('name', 'test')->first();
         $contact = Contact::where('user_id', $user->id)->first();
@@ -217,8 +213,7 @@ class ContactTest extends TestCase
 
     public function testDeleteSuccess()
     {
-        $this->seed([UserSeeder::class]);
-        $this->seed([ContactSeeder::class]);
+        $this->seed([UserSeeder::class, ContactSeeder::class]);
 
         $user = User::where('name', 'test')->first();
         $contact = Contact::where('user_id', $user->id)->first();
@@ -233,8 +228,7 @@ class ContactTest extends TestCase
 
     public function testDeleteFailed()
     {
-        $this->seed([UserSeeder::class]);
-        $this->seed([ContactSeeder::class]);
+        $this->seed([UserSeeder::class, ContactSeeder::class]);
 
         $user = User::where('name', 'test')->first();
         $contact = Contact::where('user_id', $user->id)->first();
@@ -247,5 +241,104 @@ class ContactTest extends TestCase
                     'message' => "Unauthorized",
                 ]
             ]);
+    }
+
+    public function testSearchWithName()
+    {
+        $this->seed([UserSeeder::class, SearchContactSeeder::class]);
+
+        $response = $this->get('/api/contacts?name=test', headers: [
+            "Authorization" => 'test'
+        ])->assertStatus(200)->json();
+
+        self::assertEquals(count($response['data']), 10);
+        self::assertEquals($response['meta']['current_page'], 1);
+        self::assertEquals($response['meta']['last_page'], 2);
+        self::assertEquals($response['meta']['total'], 20);
+    }
+
+    public function testSearchWithPhone()
+    {
+        $this->seed([UserSeeder::class, SearchContactSeeder::class]);
+
+        $response = $this->get('/api/contacts?phone=088', headers: [
+            "Authorization" => 'test'
+        ])->assertStatus(200)->json();
+
+        self::assertEquals(count($response['data']), 10);
+        self::assertEquals($response['meta']['current_page'], 1);
+        self::assertEquals($response['meta']['last_page'], 1);
+        self::assertEquals($response['meta']['total'], 10);
+    }
+
+    public function testSearchWithEmail()
+    {
+        $this->seed([UserSeeder::class, SearchContactSeeder::class]);
+
+        $response = $this->get('/api/contacts?email=test', headers: [
+            "Authorization" => 'test'
+        ])->assertStatus(200)->json();
+
+        self::assertEquals(count($response['data']), 10);
+        self::assertEquals($response['meta']['current_page'], 1);
+        self::assertEquals($response['meta']['last_page'], 2);
+        self::assertEquals($response['meta']['total'], 20);
+    }
+
+    public function testSearchNotFound()
+    {
+        $this->seed([UserSeeder::class, SearchContactSeeder::class]);
+
+        $response = $this->get('/api/contacts?name=tidakada', headers: [
+            "Authorization" => 'test'
+        ])->assertStatus(200)->json();
+
+        self::assertEquals(count($response['data']), 0);
+        self::assertEquals($response['meta']['current_page'], 1);
+        self::assertEquals($response['meta']['last_page'], 1);
+        self::assertEquals($response['meta']['total'], 0);
+    }
+
+    public function testWithPage()
+    {
+        $this->seed([UserSeeder::class, SearchContactSeeder::class]);
+
+        $response = $this->get('/api/contacts?page=2&size=5', headers: [
+            "Authorization" => 'test'
+        ])->assertStatus(200)->json();
+
+        self::assertEquals(count($response['data']), 5);
+        self::assertEquals($response['meta']['current_page'], 2);
+        self::assertEquals($response['meta']['last_page'], 4);
+        self::assertEquals($response['meta']['total'], 20);
+    }
+
+    public function testWithOnlySize()
+    {
+        $this->seed([UserSeeder::class, SearchContactSeeder::class]);
+
+        $response = $this->get('/api/contacts?size=5', headers: [
+            "Authorization" => 'test'
+        ])->assertStatus(200)->json();
+
+        self::assertEquals(count($response['data']), 5);
+        self::assertEquals($response['meta']['current_page'], 1);
+        self::assertEquals($response['meta']['last_page'], 4);
+        self::assertEquals($response['meta']['total'], 20);
+    }
+
+    public function testWithPageFailed()
+    {
+        $this->seed([UserSeeder::class, SearchContactSeeder::class]);
+
+        $this->get('/api/contacts?size=woy', headers: [
+            "Authorization" => 'test'
+        ])->assertStatus(400)->assertJson([
+            "errors" => [
+                "size" => [
+                    "The size field must be an integer."
+                ],
+            ]
+        ]);
     }
 }
