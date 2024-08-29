@@ -9,7 +9,6 @@ use Database\Seeders\ContactSeeder;
 use Database\Seeders\UserSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
-use Illuminate\Support\Facades\Log;
 use Tests\TestCase;
 
 class AddressTest extends TestCase
@@ -331,6 +330,89 @@ class AddressTest extends TestCase
         $addressId = $this->getAddressId();
 
         $response = $this->get('/api/contacts/haha/addresses/' . $addressId, headers: [
+            'Authorization' => 'test'
+        ])->assertStatus(404)->json();
+
+        self::assertEquals([
+            "errors" => [
+                "message" => "Contact is not found"
+            ]
+        ], $response);
+    }
+
+    public function testDeleteAddressSuccess()
+    {
+        $this->seed([UserSeeder::class, ContactSeeder::class, AddressSeeder::class]);
+        $contactId = $this->getContactId();
+        $addressId = $this->getAddressId();
+
+        $response = $this->delete('/api/contacts/' . $contactId . '/addresses/' . $addressId, headers: [
+            'Authorization' => 'test'
+        ])->assertStatus(200)->json();
+
+        self::assertEquals([
+            "data" => true
+        ], $response);
+    }
+
+    public function testDeleteAddresNotFound()
+    {
+        $this->seed([UserSeeder::class, ContactSeeder::class, AddressSeeder::class]);
+        $contactId = $this->getContactId();
+        $addressId = $this->getAddressId();
+
+        $response = $this->delete('/api/contacts/' . $contactId . '/addresses/' . $addressId + 999, headers: [
+            'Authorization' => 'test'
+        ])->assertStatus(404)->json();
+
+        self::assertEquals([
+            "errors" => [
+                "message" => "Address is not found"
+            ]
+        ], $response);
+    }
+
+    public function testDeleteAddressIsNotaNumber()
+    {
+        $this->seed([UserSeeder::class, ContactSeeder::class, AddressSeeder::class]);
+        $contactId = $this->getContactId();
+        $addressId = $this->getAddressId();
+
+        $response = $this->delete('/api/contacts/' . $contactId . '/addresses/hahah', headers: [
+            'Authorization' => 'test'
+        ])->assertStatus(404)->json();
+
+        self::assertEquals([
+            "errors" => [
+                "message" => "Address is not found"
+            ]
+        ], $response);
+    }
+
+    public function testDeleteAddressContactNotFound()
+    {
+        $this->seed([UserSeeder::class, ContactSeeder::class, AddressSeeder::class]);
+        $contactId = $this->getContactId();
+        $addressId = $this->getAddressId();
+
+        $response = $this->delete('/api/contacts/' . $contactId + 1 . '/addresses/' . $addressId, headers: [
+            'Authorization' => 'test'
+        ])->assertStatus(404)->json();
+
+        self::assertEquals([
+            "errors" => [
+                "message" => "Contact is not found"
+            ]
+        ], $response);
+    }
+
+    public function testDeleteAddressContactIsNotaNumber()
+    {
+        $this->seed([UserSeeder::class, ContactSeeder::class, AddressSeeder::class]);
+        $contactId = $this->getContactId();
+        $addressId = $this->getAddressId();
+
+        $response = $this->delete('/api/contacts/haha/addresses/' . $addressId, headers: [
             'Authorization' => 'test'
         ])->assertStatus(404)->json();
 
