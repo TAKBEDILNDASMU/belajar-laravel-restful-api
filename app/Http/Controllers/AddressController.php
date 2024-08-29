@@ -23,7 +23,7 @@ class AddressController extends Controller
             throw new HttpResponseException(
                 response()->json([
                     "errors" => [
-                        'message' => 'Contact not found'
+                        'message' => 'Contact is not found'
                     ]
                 ])->setStatusCode(404)
             );
@@ -39,7 +39,7 @@ class AddressController extends Controller
             throw new HttpResponseException(
                 response()->json([
                     'errors' => [
-                        'message' => "Address not found"
+                        'message' => "Address is not found"
                     ]
                 ])->setStatusCode(404)
             );
@@ -80,6 +80,15 @@ class AddressController extends Controller
         $data = $request->validated();
         $address->fill($data);
         $address->save();
+
+        return new AddressResource($address);
+    }
+
+    public function get(Request $request, int $contactId, int $addressId): AddressResource
+    {
+        $user = Auth::user();
+        $this->getContact($contactId, $user->id);
+        $address = $this->getAddress($contactId, $addressId);
 
         return new AddressResource($address);
     }

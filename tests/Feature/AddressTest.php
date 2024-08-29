@@ -137,7 +137,7 @@ class AddressTest extends TestCase
 
         self::assertEquals([
             'errors' => [
-                'message' => 'Contact not found'
+                'message' => 'Contact is not found'
             ]
         ], $response);
     }
@@ -220,7 +220,7 @@ class AddressTest extends TestCase
 
         self::assertEquals([
             'errors' => [
-                'message' => "Address not found"
+                'message' => "Address is not found"
             ]
         ], $response);
     }
@@ -246,6 +246,97 @@ class AddressTest extends TestCase
         self::assertEquals([
             "errors" => [
                 "message" => "Address is not found"
+            ]
+        ], $response);
+    }
+
+    public function testGetAddressSuccess()
+    {
+        $this->seed([UserSeeder::class, ContactSeeder::class, AddressSeeder::class]);
+        $contactId = $this->getContactId();
+        $addressId = $this->getAddressId();
+
+        $response = $this->get('/api/contacts/' . $contactId . '/addresses/' . $addressId, headers: [
+            'Authorization' => 'test'
+        ])->assertStatus(200)->json();
+
+        self::assertEquals([
+            "data" => [
+                "street" => "street-1",
+                "village" => "village-1",
+                "district" => "district-1",
+                "city" => "city-1",
+                "province" => "province-1",
+                "state" => "state-1",
+                "postal_code" => "111"
+            ]
+        ], $response);
+    }
+
+    public function testGetAddressNotFound()
+    {
+        $this->seed([UserSeeder::class, ContactSeeder::class, AddressSeeder::class]);
+        $contactId = $this->getContactId();
+        $addressId = $this->getAddressId();
+
+        $response = $this->get('/api/contacts/' . $contactId . '/addresses/' . $addressId + 999, headers: [
+            'Authorization' => 'test'
+        ])->assertStatus(404)->json();
+
+        self::assertEquals([
+            "errors" => [
+                "message" => "Address is not found"
+            ]
+        ], $response);
+    }
+
+    public function testGetAddressIdisNotaNumber()
+    {
+        $this->seed([UserSeeder::class, ContactSeeder::class, AddressSeeder::class]);
+        $contactId = $this->getContactId();
+        $addressId = $this->getAddressId();
+
+        $response = $this->get('/api/contacts/' . $contactId . '/addresses/haha', headers: [
+            'Authorization' => 'test'
+        ])->assertStatus(404)->json();
+
+        self::assertEquals([
+            "errors" => [
+                "message" => "Address is not found"
+            ]
+        ], $response);
+    }
+
+    public function testGetAddressContactNotFound()
+    {
+        $this->seed([UserSeeder::class, ContactSeeder::class, AddressSeeder::class]);
+        $contactId = $this->getContactId();
+        $addressId = $this->getAddressId();
+
+        $response = $this->get('/api/contacts/' . $contactId + 1 . '/addresses/' . $addressId, headers: [
+            'Authorization' => 'test'
+        ])->assertStatus(404)->json();
+
+        self::assertEquals([
+            "errors" => [
+                "message" => "Contact is not found"
+            ]
+        ], $response);
+    }
+
+    public function testGetAddressContactIsNotaNumber()
+    {
+        $this->seed([UserSeeder::class, ContactSeeder::class, AddressSeeder::class]);
+        $contactId = $this->getContactId();
+        $addressId = $this->getAddressId();
+
+        $response = $this->get('/api/contacts/haha/addresses/' . $addressId, headers: [
+            'Authorization' => 'test'
+        ])->assertStatus(404)->json();
+
+        self::assertEquals([
+            "errors" => [
+                "message" => "Contact is not found"
             ]
         ], $response);
     }

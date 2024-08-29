@@ -29,4 +29,5 @@ Route::middleware(ApiAuthMiddleware::class)->group(function () {
     Route::post('/contacts/{contactId}/addresses', [AddressController::class, 'create'])->name('address.create')->middleware(ValidateContactId::class);
     Route::get('/contacts/{contactId}/addresses', [AddressController::class, 'list'])->name('address.list')->middleware(ValidateContactId::class);
     Route::put('/contacts/{contactId}/addresses/{addressId}', [AddressController::class, 'update'])->name('address.update')->middleware([ValidateContactId::class, ValidateAddressId::class]);
+    Route::get('/contacts/{contactId}/addresses/{addressId}', [AddressController::class, 'get'])->name('address.get')->middleware([ValidateContactId::class, ValidateAddressId::class]);
 });
